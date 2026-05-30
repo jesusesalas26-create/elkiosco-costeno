@@ -1,5 +1,14 @@
 import "./styles.css";
 import { useEffect, useMemo, useState } from "react";
+import { db } from "./firebase";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
 
 const PASSWORD = "kiosco302";
 
@@ -26,7 +35,6 @@ const defaultProducts = [
     category: "Pulpas",
     stock: 20,
   },
-
   {
     name: "Combo 6 Empanadas",
     price: 12,
@@ -72,7 +80,6 @@ const defaultProducts = [
     featured: true,
     stock: 15,
   },
-
   {
     name: "Helado 3 Leches",
     price: 3.5,
@@ -102,7 +109,6 @@ const defaultProducts = [
     category: "Helados",
     stock: 30,
   },
-
   {
     name: "Pony Malta x6",
     price: 12,
@@ -135,8 +141,7 @@ const defaultProducts = [
 ];
 
 export default function App() {
-  const [products, setProducts] = useState(defaultProducts);
-
+  const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("kioscoCart");
     return savedCart ? JSON.parse(savedCart) : [];
@@ -159,13 +164,17 @@ export default function App() {
   });
 
   useEffect(() => {
-    const savedProducts = localStorage.getItem("kioscoProducts");
-    if (savedProducts) setProducts(JSON.parse(savedProducts));
-  }, []);
+    const unsub = onSnapshot(collection(db, "products"), (snapshot) => {
+      const data = snapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      }));
 
-  useEffect(() => {
-    localStorage.setItem("kioscoProducts", JSON.stringify(products));
-  }, [products]);
+      setProducts(data);
+    });
+
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("kioscoCart", JSON.stringify(cart));
@@ -200,54 +209,26 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
-  const updateProduct = (oldName, field, value) => {
-    setProducts(
-      products.map((product) =>
-        product.name === oldName
-          ? {
-              ...product,
-              [field]:
-                field === "price" || field === "stock" ? Number(value) : value,
-            }
-          : product
-      )
-    );
-
-    if (field === "name") {
-      setCart(
-        cart.map((item) =>
-          item.name === oldName ? { ...item, name: value } : item
-        )
-      );
+  const addDefaultProducts = async () => {
+    for (const product of defaultProducts) {
+      await addDoc(collection(db, "products"), product);
     }
   };
 
-  const addNewProduct = () => {
+  const addNewProduct = async () => {
     if (!newProduct.name || !newProduct.price || !newProduct.category) {
       alert("Completa nombre, precio y categoría.");
       return;
     }
 
-    const exists = products.find(
-      (p) => p.name.toLowerCase() === newProduct.name.toLowerCase()
-    );
-
-    if (exists) {
-      alert("Ese producto ya existe.");
-      return;
-    }
-
-    setProducts([
-      ...products,
-      {
-        name: newProduct.name,
-        price: Number(newProduct.price),
-        image: newProduct.image || "/logo.png",
-        category: newProduct.category,
-        stock: Number(newProduct.stock || 0),
-        featured: newProduct.featured,
-      },
-    ]);
+    await addDoc(collection(db, "products"), {
+      name: newProduct.name,
+      price: Number(newProduct.price),
+      image: newProduct.image || "/logo.png",
+      category: newProduct.category,
+      stock: Number(newProduct.stock || 0),
+      featured: newProduct.featured,
+    });
 
     setNewProduct({
       name: "",
@@ -259,88 +240,94 @@ export default function App() {
     });
   };
 
-  const deleteProduct = (name) => {
+  const updateProduct = async (product, field, value) => {
+    await updateDoc(doc(db, "products", product.id), {
+      [field]:
+        field === "price" || field === "stock"
+          ? Number(value)
+          : field === "featured"
+          ? Boolean(value)
+          : value,
+    });
+  };
+
+  const deleteProduct = async (product) => {
     if (!window.confirm("¿Eliminar este producto?")) return;
-    setProducts(products.filter((product) => product.name !== name));
-    setCart(cart.filter((item) => item.name !== name));
+    await deleteDoc(doc(db, "products", product.id));
+    setCart(cart.filter((item) => item.id !== product.id));
   };
 
-  const resetProducts = () => {
-    if (!window.confirm("¿Restaurar productos originales?")) return;
-    localStorage.removeItem("kioscoProducts");
-    setProducts(defaultProducts);
-    setCart([]);
-  };
-
-  const addToCart = (product) => {
+  const addToCart = async (product) => {
     if (product.stock <= 0) return;
 
-    const existing = cart.find((item) => item.name === product.name);
+    const existing = cart.find((item) => item.id === product.id);
 
     if (existing) {
       setCart(
         cart.map((item) =>
-          item.name === product.name ? { ...item, qty: item.qty + 1 } : item
+          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
         )
       );
     } else {
       setCart([...cart, { ...product, qty: 1 }]);
     }
 
-    setProducts(
-      products.map((item) =>
-        item.name === product.name ? { ...item, stock: item.stock - 1 } : item
-      )
-    );
+    await updateDoc(doc(db, "products", product.id), {
+      stock: Number(product.stock) - 1,
+    });
   };
 
-  const increaseQty = (name) => {
-    const product = products.find((p) => p.name === name);
+  const increaseQty = async (item) => {
+    const product = products.find((p) => p.id === item.id);
     if (!product || product.stock <= 0) return;
 
     setCart(
-      cart.map((item) =>
-        item.name === name ? { ...item, qty: item.qty + 1 } : item
+      cart.map((cartItem) =>
+        cartItem.id === item.id
+          ? { ...cartItem, qty: cartItem.qty + 1 }
+          : cartItem
       )
     );
 
-    setProducts(
-      products.map((item) =>
-        item.name === name ? { ...item, stock: item.stock - 1 } : item
-      )
-    );
+    await updateDoc(doc(db, "products", item.id), {
+      stock: Number(product.stock) - 1,
+    });
   };
 
-  const decreaseQty = (name) => {
-    const item = cart.find((p) => p.name === name);
-    if (!item) return;
-
+  const decreaseQty = async (item) => {
     if (item.qty === 1) {
-      setCart(cart.filter((p) => p.name !== name));
+      setCart(cart.filter((cartItem) => cartItem.id !== item.id));
     } else {
       setCart(
-        cart.map((p) => (p.name === name ? { ...p, qty: p.qty - 1 } : p))
+        cart.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, qty: cartItem.qty - 1 }
+            : cartItem
+        )
       );
     }
 
-    setProducts(
-      products.map((product) =>
-        product.name === name
-          ? { ...product, stock: product.stock + 1 }
-          : product
-      )
-    );
+    const product = products.find((p) => p.id === item.id);
+    if (product) {
+      await updateDoc(doc(db, "products", item.id), {
+        stock: Number(product.stock) + 1,
+      });
+    }
   };
 
-  const clearCart = () => {
-    const updatedProducts = products.map((product) => {
-      const item = cart.find((cartItem) => cartItem.name === product.name);
-      if (!item) return product;
-      return { ...product, stock: product.stock + item.qty };
-    });
+  const clearCart = async () => {
+    for (const item of cart) {
+      const product = products.find((p) => p.id === item.id);
 
-    setProducts(updatedProducts);
+      if (product) {
+        await updateDoc(doc(db, "products", item.id), {
+          stock: Number(product.stock) + item.qty,
+        });
+      }
+    }
+
     setCart([]);
+    localStorage.removeItem("kioscoCart");
   };
 
   const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
@@ -432,36 +419,42 @@ Hora de recogida:`;
       </div>
 
       <section className="products">
-        {filteredProducts.map((product) => (
-          <div className="card" key={product.name}>
-            {product.featured && (
-              <div className="featuredBadge">⭐ Popular</div>
-            )}
-
-            <div className="imageBox">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="productImage"
-              />
-            </div>
-
-            <span className="tag">{product.category}</span>
-            <h2>{product.name}</h2>
-            <p className="price">${product.price.toFixed(2)}</p>
-
-            <p className={product.stock > 0 ? "stock" : "soldOut"}>
-              {product.stock > 0 ? `Disponible: ${product.stock}` : "Agotado"}
-            </p>
-
-            <button
-              onClick={() => addToCart(product)}
-              disabled={product.stock <= 0}
-            >
-              {product.stock > 0 ? "Agregar" : "Agotado"}
-            </button>
+        {filteredProducts.length === 0 ? (
+          <div className="emptyProducts">
+            <p>No hay productos todavía.</p>
           </div>
-        ))}
+        ) : (
+          filteredProducts.map((product) => (
+            <div className="card" key={product.id}>
+              {product.featured && (
+                <div className="featuredBadge">⭐ Popular</div>
+              )}
+
+              <div className="imageBox">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="productImage"
+                />
+              </div>
+
+              <span className="tag">{product.category}</span>
+              <h2>{product.name}</h2>
+              <p className="price">${Number(product.price).toFixed(2)}</p>
+
+              <p className={product.stock > 0 ? "stock" : "soldOut"}>
+                {product.stock > 0 ? `Disponible` : "Agotado"}
+              </p>
+
+              <button
+                onClick={() => addToCart(product)}
+                disabled={product.stock <= 0}
+              >
+                {product.stock > 0 ? "Agregar" : "Agotado"}
+              </button>
+            </div>
+          ))
+        )}
       </section>
 
       <section className="cart">
@@ -472,18 +465,18 @@ Hora de recogida:`;
         ) : (
           <>
             {cart.map((item) => (
-              <div className="cartItem" key={item.name}>
+              <div className="cartItem" key={item.id}>
                 <div>
                   <strong>{item.name}</strong>
                   <p>
-                    ${item.price.toFixed(2)} x {item.qty}
+                    ${Number(item.price).toFixed(2)} x {item.qty}
                   </p>
                 </div>
 
                 <div className="qtyButtons">
-                  <button onClick={() => decreaseQty(item.name)}>-</button>
+                  <button onClick={() => decreaseQty(item)}>-</button>
                   <span>{item.qty}</span>
-                  <button onClick={() => increaseQty(item.name)}>+</button>
+                  <button onClick={() => increaseQty(item)}>+</button>
                 </div>
               </div>
             ))}
@@ -523,6 +516,12 @@ Hora de recogida:`;
       {logged && (
         <section className="inventoryPanel">
           <h2>Control de productos</h2>
+
+          {products.length === 0 && (
+            <button className="saveProductBtn" onClick={addDefaultProducts}>
+              Cargar productos iniciales
+            </button>
+          )}
 
           <div className="newProductBox">
             <h3>Agregar producto</h3>
@@ -602,30 +601,28 @@ Hora de recogida:`;
           <h3>Editar inventario</h3>
 
           {products.map((product) => (
-            <div className="editProductCard" key={product.name}>
+            <div className="editProductCard" key={product.id}>
               <div className="adminPreview">
                 <img src={product.image} alt={product.name} />
               </div>
 
               <input
                 value={product.name}
-                onChange={(e) =>
-                  updateProduct(product.name, "name", e.target.value)
-                }
+                onChange={(e) => updateProduct(product, "name", e.target.value)}
               />
 
               <input
                 type="number"
                 value={product.price}
                 onChange={(e) =>
-                  updateProduct(product.name, "price", e.target.value)
+                  updateProduct(product, "price", e.target.value)
                 }
               />
 
               <input
                 value={product.category}
                 onChange={(e) =>
-                  updateProduct(product.name, "category", e.target.value)
+                  updateProduct(product, "category", e.target.value)
                 }
               />
 
@@ -633,7 +630,7 @@ Hora de recogida:`;
                 type="number"
                 value={product.stock}
                 onChange={(e) =>
-                  updateProduct(product.name, "stock", e.target.value)
+                  updateProduct(product, "stock", e.target.value)
                 }
               />
 
@@ -646,7 +643,7 @@ Hora de recogida:`;
                     const file = e.target.files[0];
                     if (file) {
                       imageToBase64(file, (base64) => {
-                        updateProduct(product.name, "image", base64);
+                        updateProduct(product, "image", base64);
                       });
                     }
                   }}
@@ -658,7 +655,7 @@ Hora de recogida:`;
                   type="checkbox"
                   checked={!!product.featured}
                   onChange={(e) =>
-                    updateProduct(product.name, "featured", e.target.checked)
+                    updateProduct(product, "featured", e.target.checked)
                   }
                 />
                 Popular
@@ -666,16 +663,12 @@ Hora de recogida:`;
 
               <button
                 className="deleteBtn"
-                onClick={() => deleteProduct(product.name)}
+                onClick={() => deleteProduct(product)}
               >
                 Eliminar
               </button>
             </div>
           ))}
-
-          <button className="resetBtn" onClick={resetProducts}>
-            Restaurar productos originales
-          </button>
         </section>
       )}
 
