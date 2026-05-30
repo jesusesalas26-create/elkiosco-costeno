@@ -1,0 +1,576 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f6f1e8;
+  color: #082b45;
+}
+
+.container {
+  padding: 22px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.hero {
+  text-align: center;
+  background: white;
+  padding: 28px 18px;
+  border-radius: 28px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+  width: 170px;
+  max-width: 80%;
+  margin-bottom: 12px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 34px;
+  color: #062f5f;
+}
+
+.hero p {
+  font-size: 18px;
+  color: #0b6b75;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.imageBox {
+  background: #f3ecd7;
+  border-radius: 22px;
+  padding: 14px;
+  height: 160px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.tag {
+  display: inline-block;
+  background: #fff0c2;
+  color: #8a5a00;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.card h2 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.price {
+  color: #d21f26;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.card button {
+  background: #062f5f;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.cart {
+  background: white;
+  margin-top: 30px;
+  padding: 22px;
+  border-radius: 26px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f7f7f7;
+  padding: 12px;
+  border-radius: 18px;
+  margin-bottom: 12px;
+}
+
+.qtyButtons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qtyButtons button {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  background: #062f5f;
+  color: white;
+  font-size: 18px;
+}
+
+.whatsapp {
+  width: 100%;
+  background: #25d366;
+  color: white;
+  border: none;
+  padding: 18px;
+  border-radius: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.pickup {
+  text-align: center;
+  margin-top: 25px;
+  font-weight: bold;
+  color: #062f5f;
+}
+.floatingCart {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: #062f5f;
+  color: white;
+
+  padding: 16px 24px;
+  border-radius: 999px;
+
+  font-weight: bold;
+  font-size: 18px;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+
+  z-index: 999;
+
+  width: fit-content;
+
+  cursor: pointer;
+}
+.categories {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-bottom: 22px;
+  padding-bottom: 8px;
+}
+
+.categories button {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: white;
+  color: #062f5f;
+  font-weight: bold;
+  white-space: nowrap;
+  font-size: 14px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+.categories button.activeCategory {
+  background: #062f5f !important;
+  color: white !important;
+}
+.clearBtn {
+  width: 100%;
+  margin-top: 14px;
+
+  background: #d91c1c;
+  color: white;
+
+  border: none;
+  padding: 16px;
+
+  border-radius: 18px;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  box-shadow: 0 8px 18px rgba(217, 28, 28, 0.25);
+}
+.container {
+  padding-bottom: 110px;
+}
+
+.floatingCart {
+  bottom: 18px;
+  padding: 14px 22px;
+  font-size: 16px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.cart {
+  margin-bottom: 40px;
+}
+.searchBox {
+  margin-bottom: 22px;
+}
+
+.searchBox input {
+  width: 100%;
+  padding: 18px;
+
+  border: none;
+  outline: none;
+
+  border-radius: 18px;
+
+  font-size: 16px;
+
+  background: white;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+
+  box-sizing: border-box;
+}
+.promoBanner {
+  background: #062f5f;
+  color: white;
+  padding: 18px;
+  border-radius: 24px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.promoBanner span {
+  color: #ffe7a3;
+  font-size: 14px;
+}
+
+.featuredBadge {
+  background: #ffcf40;
+  color: #4b3300;
+  font-weight: bold;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+.stock {
+  font-size: 13px;
+  color: #0b6b2b;
+  font-weight: bold;
+}
+
+.soldOut {
+  font-size: 13px;
+  color: #c91f1f;
+  font-weight: bold;
+}
+
+.card button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.admin {
+  margin-top: 25px;
+}
+
+.adminToggle,
+.saveBtn {
+  width: 100%;
+  background: #062f5f;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 18px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.adminPanel {
+  background: white;
+  margin-top: 15px;
+  padding: 20px;
+  border-radius: 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.adminPanel input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 14px;
+  background: #f3f3f3;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.inventoryItem {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px;
+  gap: 8px;
+  align-items: center;
+  background: #f7f7f7;
+  padding: 10px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.inventoryItem input {
+  margin: 0;
+  text-align: center;
+}
+
+.inventoryItem button {
+  background: #d91c1c;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+}
+.privateAccess {
+  margin-top: 35px;
+  text-align: center;
+}
+
+.accessToggle {
+  background: transparent;
+  border: none;
+  color: #9b8f78;
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+.hiddenPanel {
+  display: none;
+}
+.privateAccess {
+  margin-top: 35px;
+  text-align: center;
+}
+
+.accessToggle {
+  background: transparent;
+  border: none;
+  color: #9b8f78;
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+.stock {
+  font-size: 13px;
+  color: #0b6b2b;
+  font-weight: bold;
+}
+
+.soldOut {
+  font-size: 13px;
+  color: #c91f1f;
+  font-weight: bold;
+}
+
+.card button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.adminPanel {
+  background: white;
+  margin-top: 15px;
+  padding: 20px;
+  border-radius: 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.adminPanel input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 14px;
+  background: #f3f3f3;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.saveBtn {
+  width: 100%;
+  background: #062f5f;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 18px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.inventoryItem {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px;
+  gap: 8px;
+  align-items: center;
+  background: #f7f7f7;
+  padding: 10px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.inventoryItem input {
+  margin: 0;
+  text-align: center;
+}
+
+.inventoryItem button {
+  background: #d91c1c;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+}
+.adminAccess {
+  text-align: center;
+  margin-top: 20px;
+  color: #999;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.5;
+}
+.inventoryPanel {
+  background: white;
+  padding: 22px;
+  border-radius: 28px;
+  margin-top: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.newProductBox,
+.editProductCard {
+  background: #f8f6ef;
+  padding: 16px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+.newProductBox input,
+.editProductCard input {
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 14px;
+  background: white;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+
+.editProductCard {
+  display: grid;
+  gap: 8px;
+}
+
+.saveProductBtn {
+  width: 100%;
+  background: #062f5f;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.deleteBtn {
+  background: #d91c1c;
+  color: white;
+  border: none;
+  padding: 13px;
+  border-radius: 14px;
+  font-weight: bold;
+}
+
+.resetBtn {
+  width: 100%;
+  background: #9b1c1c;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 16px;
+  font-weight: bold;
+}
+
+.checkRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.imageBox {
+  background: #f3ecd7;
+  border-radius: 22px;
+  padding: 14px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+.adminPreview {
+  width: 90px;
+  height: 90px;
+  background: #f3ecd7;
+  border-radius: 16px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.adminPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.editProductCard {
+  overflow: hidden;
+}
